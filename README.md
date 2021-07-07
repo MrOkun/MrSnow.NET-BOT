@@ -10,6 +10,6 @@ The TaskNote.
     - [x] Only an error indicating actions for the user.
     - [ ] Writing a token from the program.
 		
-- [ ] Commands
+- [x] Commands
 	- [x] !инфо.
 	- [x] !рандом.
