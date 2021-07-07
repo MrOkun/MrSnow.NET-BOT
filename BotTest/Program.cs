@@ -61,9 +61,24 @@ namespace Discord_Bot_Tut
 
         private string Token()
         {
-            StreamReader sr = new StreamReader("Token.txt"); //обьявляем и указываем путь до файла.
-            var token = sr.ReadToEnd(); //читаем всё из указанного файла.
-            return token; //возвращаем значение токена.
+            try
+            {
+                StreamReader sr = new StreamReader("Token.txt"); //обьявляем и указываем путь до файла.
+                var token = sr.ReadToEnd(); //читаем всё из указанного файла.
+                return token; //возвращаем значение токена.
+            }
+            catch
+            {
+                TokenE();
+                return null;
+            }
+        }
+
+        private void TokenE()//говнокод, надо пофиксить и дать возможноть записать файл без закрытия.
+        {
+            Console.WriteLine("Введите путь до файла в Token.txt");
+            Console.ReadLine();
+            Environment.Exit(0);
         }
     }
 }
