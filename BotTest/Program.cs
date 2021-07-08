@@ -11,11 +11,11 @@ namespace Discord_Bot_Tut
     {
         private DiscordSocketClient client;
         private string botToken;
-
+        private string log;
         static void Main(string[] args)
         {
             main:
-            Console.Write("What should be done?\n 1.Start bot\n 2.Reset bot settings(if bot crashed)\r\n ---->");
+            Console.Write("What should be done?\n 1.Start bot\n 2.Reset bot settings(if bot crashed)\n 3.Log clear\n ---->");
             var value = Console.ReadLine();
 
             switch (value)
@@ -35,6 +35,19 @@ namespace Discord_Bot_Tut
                         {
                             File.Delete("Token.txt");
                         }
+                        Console.Clear();
+                        goto main;
+                    }
+
+                case "3":
+                    {
+                        Console.WriteLine("Log clearing...");
+
+                        using (StreamWriter sw = new StreamWriter("Log.txt"))
+                        {
+                            sw.WriteLine("---log---");
+                        }
+                        Console.Clear();
                         goto main;
                     }
 
@@ -64,7 +77,6 @@ namespace Discord_Bot_Tut
             client.MessageReceived += CommandsHandler;
             client.Log += Log;
 
-            //ODYyMjk2ODc5MTE4NjgwMDY1.YOWSjA.OFmNtcMYjmAMQXKhDQHDjUd0XSg
             await client.LoginAsync(TokenType.Bot, botToken);//Логиним бота, получаем значение токена.
 
             Console.ForegroundColor = ConsoleColor.DarkYellow;
@@ -73,6 +85,7 @@ namespace Discord_Bot_Tut
 
             await client.StartAsync();
 
+            Console.WriteLine("---Log---");
             Console.ReadLine();
         }
 
@@ -84,6 +97,19 @@ namespace Discord_Bot_Tut
 
         private Task CommandsHandler(SocketMessage msg)
         {
+            var nowLog = $"{DateTime.Now}:{msg.Author} - {msg}";
+            Console.WriteLine(nowLog);
+
+            using (StreamReader sr = new StreamReader("Log.txt"))
+            {
+                log = sr.ReadToEnd(); //читаем всё из указанного файла.
+            }
+
+            using (StreamWriter sw = new StreamWriter("Log.txt"))
+            {
+                sw.WriteLine(log + nowLog);
+            }
+
             if (!msg.Author.IsBot)
                 switch (msg.Content)
                 {
