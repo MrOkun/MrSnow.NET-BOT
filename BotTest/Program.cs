@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Threading;
 using System.Threading.Tasks;
 using Discord;
 using Discord.WebSocket;
@@ -8,17 +9,68 @@ namespace Discord_Bot_Tut
 {
     class Program
     {
-        DiscordSocketClient client;
+        private DiscordSocketClient client;
+        private string botToken;
+
         static void Main(string[] args)
-            => new Program().MainAsync().GetAwaiter().GetResult();
+        {
+            main:
+            Console.Write("What should be done?\n 1.Start bot\n 2.Reset bot settings(if bot crashed)\r\n ---->");
+            var value = Console.ReadLine();
+
+            switch (value)
+            {
+                case "1":
+                    {
+                        Console.WriteLine("Bot starting...");
+                        Console.Clear();
+                        new Program().MainAsync().GetAwaiter().GetResult();
+                        break;
+                    }
+
+                case "2":
+                    {
+                        Console.WriteLine("Bot settings restore...");
+                        if (File.Exists("Token.txt"))
+                        {
+                            File.Delete("Token.txt");
+                        }
+                        goto main;
+                    }
+
+                default:
+                    {
+                        Console.ForegroundColor = ConsoleColor.Red;
+                        Console.WriteLine("You entered a wrong value.");
+                        Console.ResetColor();
+
+                        Thread.Sleep(500);
+                        Console.Clear();
+                        goto main;
+                    }
+
+            }
+        }
 
         private async Task MainAsync()
         {
+            if (!File.Exists("Token.txt"))
+            {
+                tokenWriter();
+            }
+            tokenReader();
+
             client = new DiscordSocketClient();
             client.MessageReceived += CommandsHandler;
             client.Log += Log;
 
-            await client.LoginAsync(TokenType.Bot, Token());//Логиним бота, получаем значение токена.
+            //ODYyMjk2ODc5MTE4NjgwMDY1.YOWSjA.OFmNtcMYjmAMQXKhDQHDjUd0XSg
+            await client.LoginAsync(TokenType.Bot, botToken);//Логиним бота, получаем значение токена.
+
+            Console.ForegroundColor = ConsoleColor.DarkYellow;
+            Console.WriteLine("Attention, if there were no errors, the token was loaded successfully! If not, restore bot setting in menu.");
+            Console.ResetColor();
+
             await client.StartAsync();
 
             Console.ReadLine();
@@ -59,26 +111,22 @@ namespace Discord_Bot_Tut
             return Task.CompletedTask;
         }
 
-        private string Token()
+        private void tokenWriter()
         {
-            try
+            using (StreamWriter sw = new StreamWriter("Token.txt"))
             {
-                StreamReader sr = new StreamReader("Token.txt"); //обьявляем и указываем путь до файла.
-                var token = sr.ReadToEnd(); //читаем всё из указанного файла.
-                return token; //возвращаем значение токена.
-            }
-            catch
-            {
-                TokenE();
-                return null;
+                Console.Write("Write your token here ----->");
+                var token = Console.ReadLine();
+                sw.WriteLine(token);
             }
         }
-
-        private void TokenE()//говнокод, надо пофиксить и дать возможноть записать файл без закрытия.
+        private void tokenReader()
         {
-            Console.WriteLine("Введите путь до файла в Token.txt");
-            Console.ReadLine();
-            Environment.Exit(0);
+            using (StreamReader sr = new StreamReader("Token.txt"))
+            {
+                var tokenS = sr.ReadToEnd(); //читаем всё из указанного файла.
+                botToken = tokenS;
+            }
         }
     }
 }
