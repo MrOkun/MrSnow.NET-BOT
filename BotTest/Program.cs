@@ -15,6 +15,7 @@ namespace Discord_Bot_Tut
         static void Main(string[] args)
         {
             main:
+            Console.ForegroundColor = ConsoleColor.Cyan;
             Console.Write("What should be done?\n 1.Start bot\n 2.Reset bot settings(if bot crashed)\n 3.Log clear\n ---->");
             var value = Console.ReadLine();
 
@@ -45,7 +46,7 @@ namespace Discord_Bot_Tut
 
                         using (StreamWriter sw = new StreamWriter("Log.txt"))
                         {
-                            sw.WriteLine("---log---");
+                            sw.WriteLine("Log is Cleared :D");
                         }
                         Console.Clear();
                         goto main;
@@ -85,7 +86,7 @@ namespace Discord_Bot_Tut
 
             await client.StartAsync();
 
-            Console.WriteLine("---Log---");
+            Console.WriteLine("=-=-=-=-=-=-=-=-=-=log=-=-=-=-=-=-=-=-=-=");
             Console.ReadLine();
         }
 
@@ -97,7 +98,10 @@ namespace Discord_Bot_Tut
 
         private Task CommandsHandler(SocketMessage msg)
         {
-            var nowLog = $"{DateTime.Now}:{msg.Author} - {msg}";
+            Console.ForegroundColor = ConsoleColor.Gray;
+
+            var nowLog = $"{DateTime.Now.ToString("yy:mm:ss")} User        Said - {msg}({msg.Author})";
+
             Console.WriteLine(nowLog);
 
             using (StreamReader sr = new StreamReader("Log.txt"))
@@ -119,11 +123,11 @@ namespace Discord_Bot_Tut
                             if (squad.Length > 1)
                             {
                                 squad = squad.Replace("d", "d ");
-                                msg.Channel.SendMessageAsync($"Привет, {msg.Author.Mention} из {squad} ");
+                                msg.Channel.SendMessageAsync($"Привет, {msg.Author.Username} из {squad} ");
                             }
                             else
                             {
-                                msg.Channel.SendMessageAsync($"Привет, {msg.Author.Mention}");
+                                msg.Channel.SendMessageAsync($"Привет, {msg.Author.Username}");
                             }
                             break;
                         }
@@ -131,6 +135,24 @@ namespace Discord_Bot_Tut
                         {
                             Random rnd = new Random();
                             msg.Channel.SendMessageAsync($"Выпало число {rnd.Next(0, 10)}");
+                            break;
+                        }
+                    case "!админ":
+                        {
+                            for (int i = 0; i < 100; i += 10)
+                            {
+                                Random rnd = new Random();
+                                var value = rnd.Next(0, 9);
+                                if (i < 90)
+                                {
+                                    msg.Channel.SendMessageAsync($"Взлом Log[{i + value}]");
+                                }
+                                else
+                                {
+                                    msg.Channel.SendMessageAsync("Взлом Log[%Complite%]");
+                                }
+
+                            }
                             break;
                         }
                 }
